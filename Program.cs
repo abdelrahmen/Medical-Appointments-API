@@ -44,7 +44,7 @@ namespace Medical_Appointments_API
 				//options.SaveToken = true;
 				options.TokenValidationParameters = new TokenValidationParameters
 				{
-					//ValidateLifetime = true,
+					ValidateLifetime = true,
 					ClockSkew = TimeSpan.Zero,
 					ValidateIssuer = true,
 					ValidateAudience = true,
