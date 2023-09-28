@@ -21,7 +21,16 @@ namespace Medical_Appointments_API
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
-			builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+			builder.Services.AddDbContext<AppDbContext>();
+
+			builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
+				options =>
+				{
+					options.Password.RequireNonAlphanumeric = false;
+					options.Password.RequireDigit = false;
+					options.Password.RequireLowercase = false;
+					options.Password.RequireUppercase = false;
+				}).AddEntityFrameworkStores<AppDbContext>();
 
 			var config = builder.Configuration;
 
@@ -35,7 +44,8 @@ namespace Medical_Appointments_API
 				//options.SaveToken = true;
 				options.TokenValidationParameters = new TokenValidationParameters
 				{
-					ValidateLifetime = true,
+					//ValidateLifetime = true,
+					ClockSkew = TimeSpan.Zero,
 					ValidateIssuer = true,
 					ValidateAudience = true,
 					ValidIssuer = config["Jwt:Issuer"],
