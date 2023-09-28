@@ -1,5 +1,7 @@
 using Medical_Appointments_API.Data;
 using Medical_Appointments_API.Data.Models;
+using Medical_Appointments_API.Repositories;
+using Medical_Appointments_API.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -22,7 +24,7 @@ namespace Medical_Appointments_API
 			builder.Services.AddSwaggerGen();
 
 			builder.Services.AddDbContext<AppDbContext>();
-
+			builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 			builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
 				options =>
 				{

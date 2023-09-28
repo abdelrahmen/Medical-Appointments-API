@@ -11,6 +11,8 @@ namespace Medical_Appointments_API.Data
 	public class AppDbContext : IdentityDbContext<ApplicationUser>
 	{
 
+		public DbSet<Appointment> appointments { get; set; }
+		public DbSet<MedicalHistory> medicalHistories { get; set; }
 		protected override void OnModelCreating(ModelBuilder builder)
 		{
 			base.OnModelCreating(builder);
