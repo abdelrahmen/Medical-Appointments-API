@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace Medical_Appointments_API.Controllers
 {
-    [Route("api/[controller]")]
+	[Route("api/[controller]")]
 	[ApiController]
 	public class AppointmentsController : ControllerBase
 	{
@@ -20,7 +20,7 @@ namespace Medical_Appointments_API.Controllers
 		}
 
 		[HttpGet]
-		[Authorize(Roles ="Admin")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetAllAppointments()
 		{
 			var appointments = await appointmentRepository.GetAllAsync();
@@ -50,7 +50,7 @@ namespace Medical_Appointments_API.Controllers
 
 		[HttpGet("my-appointments")]
 		[Authorize]
-		public async Task<IActionResult> GetScheduledAppointmentsByPatient() 
+		public async Task<IActionResult> GetScheduledAppointmentsByPatient()
 		{
 			string patientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			var appointments = await appointmentRepository.GetScheduledByPatientIdAsync(patientId);
@@ -104,8 +104,16 @@ namespace Medical_Appointments_API.Controllers
 		[Authorize]
 		public async Task<IActionResult> DeleteAppointment(int id)
 		{
-			await appointmentRepository.DeleteAsync(id);
-			return NoContent();
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			try
+			{
+				await appointmentRepository.DeleteAsync(id, userId);
+				return NoContent();
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 	}
 }

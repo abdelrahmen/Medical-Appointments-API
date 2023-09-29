@@ -21,15 +21,26 @@ namespace Medical_Appointments_API.Repositories
 			await context.SaveChangesAsync();
 		}
 
-		public async Task DeleteAsync(int appointmentId)
+		public async Task DeleteAsync(int appointmentId, string userId)
 		{
 			var appointment = await context.appointments.FirstOrDefaultAsync(a => a.AppointmentID == appointmentId);
 			if (appointment != null)
 			{
-				context.appointments.Remove(appointment);
-				await context.SaveChangesAsync();
+				if (appointment.PatientId == userId || appointment.DoctorId == userId)
+				{
+					context.appointments.Remove(appointment);
+					await context.SaveChangesAsync();
+				}
+                else
+                {
+					throw new Exception("You are not allowed to delete this appointment");
+				}
+            }
+            else
+            {
+				throw new Exception("Appointment not found");
 			}
-		}
+        }
 
 		public async Task<Appointment?> GetByIdAsync(int appointmentId)
 		{
@@ -64,15 +75,15 @@ namespace Medical_Appointments_API.Repositories
 			{
 				currentAppointment.Status = "Scheduled";
 				currentAppointment.PatientId = appointment.PatientId;
-				currentAppointment.Notes= appointment.Notes;
-				
+				currentAppointment.Notes = appointment.Notes;
+
 				context.appointments.Update(currentAppointment);
 			}
 		}
 
 		public async Task<IEnumerable<Appointment>> GetScheduledByPatientIdAsync(string patientId)
 		{
-			var appointments = await context.appointments.Where(a=>a.PatientId == patientId).ToListAsync();
+			var appointments = await context.appointments.Where(a => a.PatientId == patientId).ToListAsync();
 			return appointments;
 		}
 	}
