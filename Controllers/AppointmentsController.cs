@@ -29,16 +29,22 @@ namespace Medical_Appointments_API.Controllers
 
 		[HttpGet("{id}")]
 		[Authorize]
-		public async Task<IActionResult> GetAppointment(int id)
+		public async Task<IActionResult> GetAppointment(int appointmentId)
 		{
-			var appointment = await appointmentRepository.GetByIdAsync(id);
-
-			if (appointment == null)
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			try
 			{
-				return NotFound();
+				var appointment = await appointmentRepository.GetByIdAsync(appointmentId, userId);
+				if (appointment == null)
+				{
+					return NotFound();
+				}
+				return Ok(appointment);
 			}
-
-			return Ok(appointment);
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 
 		[HttpGet("Available")]
