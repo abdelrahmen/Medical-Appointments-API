@@ -102,6 +102,28 @@ namespace Medical_Appointments_API.Repositories
 			}
 		}
 
+		public async Task CancelAsync(int appointmentId, string userId)
+		{
+			var currentAppointment = await context.appointments.FirstOrDefaultAsync(a => a.AppointmentID == appointmentId);
+			if (currentAppointment != null)
+			{
+				if (currentAppointment.PatientId == userId || currentAppointment.DoctorId == userId)
+				{
+					currentAppointment.Status = "Canceled";
+					currentAppointment.Notes += $"\n Appointment canceled by user: {userId}";
+					await context.SaveChangesAsync();
+				}
+				else
+				{
+					throw new UnauthorizedAccessException("You are not authorized to cancel this appointment.");
+				}
+			}
+			else
+			{
+				throw new ArgumentException("Appointment not found.");
+			}
+		}
+
 		public async Task<IEnumerable<Appointment>> GetScheduledByPatientIdAsync(string patientId)
 		{
 			var appointments = await context.appointments.Where(a => a.PatientId == patientId).ToListAsync();

@@ -121,6 +121,23 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
+		// Put: api/appointments/1
+		[HttpPut("{id}")]
+		[Authorize]
+		public async Task<IActionResult> CancelAppointment(int appointmentId)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			try
+			{
+				await appointmentRepository.CancelAsync(appointmentId, userId);
+				return NoContent();
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
 		// DELETE: api/appointments/1
 		[HttpDelete("{id}")]
 		[Authorize]

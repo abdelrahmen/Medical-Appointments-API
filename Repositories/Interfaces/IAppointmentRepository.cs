@@ -13,6 +13,7 @@ namespace Medical_Appointments_API.Repositories.Interfaces
 		Task AddAsync(Appointment appointment);
 		Task UpdateAsync(Appointment appointment);
 		Task BookAsync(BookAppointmentDTO appointment);
+		Task CancelAsync(int appointmentId, string userId);
 		Task DeleteAsync(int appointmentId, string userId);
 
 	}
