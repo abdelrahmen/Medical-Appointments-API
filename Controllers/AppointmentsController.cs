@@ -63,10 +63,10 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
-		// GET: api/appointments/Available?speciality=neurology&pageNumber=2&pageSize=20
-		[HttpGet("Available")]
+		// GET: api/appointments/Available/BySpeciality/{speciality}?pageNumber=2&pageSize=20
+		[HttpGet("Available/BySpeciality/{speciality}")]
 		public async Task<IActionResult> GetAvailableAppointmentsBySpeciality(
-			[FromQuery] string speciality,
+			[FromRoute] string speciality,
 			[FromQuery] int pageNumber = 1,
 			[FromQuery] int pageSize = 10
 			)
