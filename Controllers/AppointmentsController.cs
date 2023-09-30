@@ -54,6 +54,14 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		[HttpGet("Available")]
+		public async Task<IActionResult> GetAvailableAppointmentsBySpeciality([FromQuery] string speciality)
+		{
+
+			var appointments = await appointmentRepository.GetAvailableBySpecialityAsync(speciality);
+			return Ok(appointments);
+		}
+
 		[HttpGet("my-appointments")]
 		[Authorize]
 		public async Task<IActionResult> GetScheduledAppointmentsByPatient()

@@ -31,33 +31,42 @@ namespace Medical_Appointments_API.Repositories
 					context.appointments.Remove(appointment);
 					await context.SaveChangesAsync();
 				}
-                else
-                {
+				else
+				{
 					throw new Exception("You are not allowed to delete this appointment");
 				}
-            }
-            else
-            {
+			}
+			else
+			{
 				throw new Exception("Appointment not found");
 			}
-        }
+		}
 
 		public async Task<Appointment?> GetByIdAsync(int appointmentId, string userId)
 		{
-            var appointment = await context.appointments.FirstOrDefaultAsync(a => a.AppointmentID == appointmentId);
-            if (appointment != null)
-            {
-                if (appointment.PatientId == userId || appointment.DoctorId ==userId)
-                {
+			var appointment = await context.appointments.FirstOrDefaultAsync(a => a.AppointmentID == appointmentId);
+			if (appointment != null)
+			{
+				if (appointment.PatientId == userId || appointment.DoctorId == userId)
+				{
 					return appointment;
-                }
-                else
-                {
-                    throw new Exception("You are not allowed to view this appointment");
 				}
-            }
+				else
+				{
+					throw new Exception("You are not allowed to view this appointment");
+				}
+			}
 			return null;
-        }
+		}
+
+		public async Task<IEnumerable<Appointment>> GetAvailableBySpecialityAsync(string speciality)
+		{
+			var appointmets = context.appointments
+				.Include(a => a.Doctor)
+				.Where(a => a.Status.Equals("Available"))
+				.Where(a => a.Doctor.Specialty.Equals(speciality, StringComparison.OrdinalIgnoreCase));
+			return await appointmets.ToListAsync();
+		}
 
 		public async Task<IEnumerable<Appointment>> GetAllAsync()
 		{
