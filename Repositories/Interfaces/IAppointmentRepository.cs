@@ -5,10 +5,10 @@ namespace Medical_Appointments_API.Repositories.Interfaces
 {
 	public interface IAppointmentRepository
 	{
-		Task<IEnumerable<Appointment>> GetAllAsync();
-		Task<IEnumerable<Appointment>> GetAvailableAsync();//status = available
-		Task<IEnumerable<Appointment>> GetAvailableBySpecialityAsync(string speciality);
-		Task<IEnumerable<Appointment>> GetScheduledByPatientIdAsync(string patientId);
+		Task<IEnumerable<Appointment>> GetAllAsync(int pageNumber, int pageSize);
+		Task<IEnumerable<Appointment>> GetAvailableAsync(int pageNumber, int pageSize);//status = available
+		Task<IEnumerable<Appointment>> GetAvailableBySpecialityAsync(string speciality, int pageNumber, int pageSize);
+		Task<IEnumerable<Appointment>> GetScheduledByPatientIdAsync(string patientId, int pageNumber, int pageSize);
 		Task<Appointment?> GetByIdAsync(int appointmentId, string userId);
 		Task AddAsync(Appointment appointment);
 		Task UpdateAsync(Appointment appointment);

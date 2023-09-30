@@ -59,23 +59,32 @@ namespace Medical_Appointments_API.Repositories
 			return null;
 		}
 
-		public async Task<IEnumerable<Appointment>> GetAvailableBySpecialityAsync(string speciality)
+		public async Task<IEnumerable<Appointment>> GetAvailableBySpecialityAsync(string speciality, int pageNumber, int pageSize)
 		{
 			var appointmets = context.appointments
 				.Include(a => a.Doctor)
 				.Where(a => a.Status.Equals("Available"))
 				.Where(a => a.Doctor.Specialty.Equals(speciality, StringComparison.OrdinalIgnoreCase));
-			return await appointmets.ToListAsync();
+
+			return await appointmets
+				.Skip((pageNumber - 1) * pageSize)
+				.Take(pageSize).ToListAsync();
 		}
 
-		public async Task<IEnumerable<Appointment>> GetAllAsync()
+		public async Task<IEnumerable<Appointment>> GetAllAsync(int pageNumber, int pageSize)
 		{
-			return await context.appointments.ToListAsync();
+			return await context.appointments
+				.Skip((pageNumber - 1) * pageSize)
+				.Take(pageSize)
+				.ToListAsync();
 		}
 
-		public async Task<IEnumerable<Appointment>> GetAvailableAsync()
+		public async Task<IEnumerable<Appointment>> GetAvailableAsync(int pageNumber, int pageSize)
 		{
-			var available = await context.appointments.Where(a => a.Status.Equals("Available")).ToListAsync();
+			var available = await context.appointments
+				.Where(a => a.Status.Equals("Available"))
+				.Skip((pageNumber - 1) * pageSize)
+				.Take(pageSize).ToListAsync();
 			return available;
 		}
 
@@ -124,9 +133,12 @@ namespace Medical_Appointments_API.Repositories
 			}
 		}
 
-		public async Task<IEnumerable<Appointment>> GetScheduledByPatientIdAsync(string patientId)
+		public async Task<IEnumerable<Appointment>> GetScheduledByPatientIdAsync(string patientId, int pageNumber, int pageSize)
 		{
-			var appointments = await context.appointments.Where(a => a.PatientId == patientId).ToListAsync();
+			var appointments = await context.appointments
+				.Where(a => a.PatientId == patientId)
+				.Skip((pageNumber - 1) * pageSize)
+				.Take(pageSize).ToListAsync();
 			return appointments;
 		}
 	}

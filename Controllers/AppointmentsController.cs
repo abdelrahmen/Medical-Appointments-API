@@ -19,12 +19,15 @@ namespace Medical_Appointments_API.Controllers
 			this.appointmentRepository = appointmentRepository;
 		}
 
-		// GET: api/appointments
+		// GET /api/appointments?pageNumber=2&pageSize=20
 		[HttpGet]
 		[Authorize(Roles = "Admin")]
-		public async Task<IActionResult> GetAllAppointments()
+		public async Task<IActionResult> GetAllAppointments(
+			[FromQuery] int pageNumber = 1,
+			[FromQuery] int pageSize = 10
+			)
 		{
-			var appointments = await appointmentRepository.GetAllAsync();
+			var appointments = await appointmentRepository.GetAllAsync(pageNumber, pageSize);
 			return Ok(appointments);
 		}
 
@@ -49,30 +52,40 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
-		// GET: api/appointments/Available
+		// GET: api/appointments/Available?pageNumber=2&pageSize=20
 		[HttpGet("Available")]
-		public async Task<IActionResult> GetAvailableAppointments()
+		public async Task<IActionResult> GetAvailableAppointments(
+			[FromQuery] int pageNumber = 1,
+			[FromQuery] int pageSize = 10
+			)
 		{
-			var appointments = await appointmentRepository.GetAvailableAsync();
+			var appointments = await appointmentRepository.GetAvailableAsync(pageNumber, pageSize);
 			return Ok(appointments);
 		}
 
-		// GET: api/appointments/Available?speciality=neurology
+		// GET: api/appointments/Available?speciality=neurology&pageNumber=2&pageSize=20
 		[HttpGet("Available")]
-		public async Task<IActionResult> GetAvailableAppointmentsBySpeciality([FromQuery] string speciality)
+		public async Task<IActionResult> GetAvailableAppointmentsBySpeciality(
+			[FromQuery] string speciality,
+			[FromQuery] int pageNumber = 1,
+			[FromQuery] int pageSize = 10
+			)
 		{
 
-			var appointments = await appointmentRepository.GetAvailableBySpecialityAsync(speciality);
+			var appointments = await appointmentRepository.GetAvailableBySpecialityAsync(speciality, pageNumber, pageSize);
 			return Ok(appointments);
 		}
 
 		// GET: api/appointments/my-appointments
 		[HttpGet("my-appointments")]
 		[Authorize]
-		public async Task<IActionResult> GetScheduledAppointmentsByPatient()
+		public async Task<IActionResult> GetScheduledAppointmentsByPatient(
+			[FromQuery] int pageNumber = 1,
+			[FromQuery] int pageSize = 10
+			)
 		{
 			string patientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var appointments = await appointmentRepository.GetScheduledByPatientIdAsync(patientId);
+			var appointments = await appointmentRepository.GetScheduledByPatientIdAsync(patientId, pageNumber, pageSize);
 			return Ok(appointments);
 		}
 
