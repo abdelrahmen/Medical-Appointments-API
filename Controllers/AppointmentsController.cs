@@ -19,6 +19,7 @@ namespace Medical_Appointments_API.Controllers
 			this.appointmentRepository = appointmentRepository;
 		}
 
+		// GET: api/appointments
 		[HttpGet]
 		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetAllAppointments()
@@ -27,6 +28,7 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		// GET: api/appointments/1
 		[HttpGet("{id}")]
 		[Authorize]
 		public async Task<IActionResult> GetAppointment(int appointmentId)
@@ -47,6 +49,7 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
+		// GET: api/appointments/Available
 		[HttpGet("Available")]
 		public async Task<IActionResult> GetAvailableAppointments()
 		{
@@ -54,6 +57,7 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		// GET: api/appointments/Available?speciality=neurology
 		[HttpGet("Available")]
 		public async Task<IActionResult> GetAvailableAppointmentsBySpeciality([FromQuery] string speciality)
 		{
@@ -62,6 +66,7 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		// GET: api/appointments/my-appointments
 		[HttpGet("my-appointments")]
 		[Authorize]
 		public async Task<IActionResult> GetScheduledAppointmentsByPatient()
@@ -71,6 +76,7 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		// POST: api/appointments
 		[HttpPost]
 		[Authorize(Roles = "MedicalProfessional")]
 		public async Task<IActionResult> CreateAppointment(CreateAppointmentDTO appointmentDTO)
@@ -90,6 +96,7 @@ namespace Medical_Appointments_API.Controllers
 			return BadRequest(ModelState);
 		}
 
+		// PUT: api/appointments/Book/1
 		[HttpPut("Book/{id}")]
 		[Authorize]
 		public async Task<IActionResult> BookAppointment(int id, BookAppointmentDTO appointment)
@@ -114,6 +121,7 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
+		// DELETE: api/appointments/1
 		[HttpDelete("{id}")]
 		[Authorize]
 		public async Task<IActionResult> DeleteAppointment(int id)
