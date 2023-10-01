@@ -19,7 +19,12 @@ namespace Medical_Appointments_API.Controllers
 			this.appointmentRepository = appointmentRepository;
 		}
 
-		// GET /api/appointments?pageNumber=2&pageSize=20
+		/// <summary>
+		/// Get a paginated list of all appointments.
+		/// </summary>
+		/// <param name="pageNumber">The page number (default is 1).</param>
+		/// <param name="pageSize">The number of items per page (default is 10).</param>
+		/// <returns>A paginated list of appointments.</returns>
 		[HttpGet]
 		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetAllAppointments(
@@ -31,7 +36,11 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
-		// GET: api/appointments/1
+		/// <summary>
+		/// Get an appointment by its unique identifier.
+		/// </summary>
+		/// <param name="appointmentId">The ID of the appointment to retrieve.</param>
+		/// <returns>The appointment with the specified ID, if found; otherwise, returns NotFound.</returns>
 		[HttpGet("{id}")]
 		[Authorize]
 		public async Task<IActionResult> GetAppointment(int appointmentId)
@@ -52,6 +61,12 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Get a list of available appointments for scheduling.
+		/// </summary>
+		/// <param name="pageNumber">The page number for pagination (default is 1).</param>
+		/// <param name="pageSize">The number of appointments to include per page (default is 10).</param>
+		/// <returns>A paginated list of available appointments.</returns>
 		// GET: api/appointments/Available?pageNumber=2&pageSize=20
 		[HttpGet("Available")]
 		public async Task<IActionResult> GetAvailableAppointments(
@@ -63,6 +78,13 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		/// <summary>
+		/// Get a list of available appointments for a specific medical specialty.
+		/// </summary>
+		/// <param name="speciality">The medical specialty to filter appointments by.</param>
+		/// <param name="pageNumber">The page number for pagination (default is 1).</param>
+		/// <param name="pageSize">The number of appointments to include per page (default is 10).</param>
+		/// <returns>A paginated list of available appointments for the specified specialty.</returns>
 		// GET: api/appointments/Available/BySpeciality/{speciality}?pageNumber=2&pageSize=20
 		[HttpGet("Available/BySpeciality/{speciality}")]
 		public async Task<IActionResult> GetAvailableAppointmentsBySpeciality(
@@ -76,6 +98,12 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		/// <summary>
+		/// Get a list of scheduled appointments for the currently authenticated patient.
+		/// </summary>
+		/// <param name="pageNumber">The page number for pagination (default is 1).</param>
+		/// <param name="pageSize">The number of appointments to include per page (default is 10).</param>
+		/// <returns>A paginated list of scheduled appointments for the authenticated patient.</returns>
 		// GET: api/appointments/my-appointments
 		[HttpGet("my-appointments")]
 		[Authorize]
@@ -89,6 +117,14 @@ namespace Medical_Appointments_API.Controllers
 			return Ok(appointments);
 		}
 
+		/// <summary>
+		/// Create a new appointment by a medical professional for a patient.
+		/// </summary>
+		/// <param name="appointmentDTO">The appointment details to be created.</param>
+		/// <returns>
+		/// Returns a 201 Created response with the created appointment's details if successful.
+		/// Returns a Bad Request (400) response with validation errors if the model state is invalid.
+		/// </returns>
 		// POST: api/appointments
 		[HttpPost]
 		[Authorize(Roles = "MedicalProfessional")]
@@ -109,6 +145,17 @@ namespace Medical_Appointments_API.Controllers
 			return BadRequest(ModelState);
 		}
 
+		/// <summary>
+		/// Book an available appointment by a patient.
+		/// </summary>
+		/// <param name="id">The ID of the appointment to be booked.</param>
+		/// <param name="appointment">The appointment details including the appointment ID.</param>
+		/// <returns>
+		/// Returns an OK (200) response with a success message if the appointment is booked successfully.
+		/// Returns a Bad Request (400) response with an "ID mismatch" message if the provided ID and appointment ID do not match.
+		/// Returns a Bad Request (400) response with validation errors if the model state is invalid.
+		/// Returns a Bad Request (400) response with an error message if an error occurs during booking.
+		/// </returns>
 		// PUT: api/appointments/Book/1
 		[HttpPut("Book/{id}")]
 		[Authorize]
@@ -134,6 +181,14 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Cancel an existing appointment by the patient or doctor.
+		/// </summary>
+		/// <param name="appointmentId">The ID of the appointment to be canceled.</param>
+		/// <returns>
+		/// Returns a No Content (204) response if the appointment is canceled successfully.
+		/// Returns a Bad Request (400) response with an error message if an error occurs during cancellation.
+		/// </returns>
 		// Put: api/appointments/1
 		[HttpPut("{id}")]
 		[Authorize]
@@ -151,6 +206,14 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
+		/// <summary>
+		/// Delete an existing appointment by the patient or doctor.
+		/// </summary>
+		/// <param name="id">The ID of the appointment to be deleted.</param>
+		/// <returns>
+		/// Returns a No Content (204) response if the appointment is deleted successfully.
+		/// Returns a Bad Request (400) response with an error message if an error occurs during deletion.
+		/// </returns>
 		// DELETE: api/appointments/1
 		[HttpDelete("{id}")]
 		[Authorize]
