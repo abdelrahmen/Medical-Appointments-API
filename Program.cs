@@ -25,6 +25,7 @@ namespace Medical_Appointments_API
 
 			builder.Services.AddDbContext<AppDbContext>();
 			builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+			builder.Services.AddScoped<IMedicalHistoryRepository, MedicalHistoryRepository>();
 			builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
 				options =>
 				{
