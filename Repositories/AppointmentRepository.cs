@@ -42,21 +42,9 @@ namespace Medical_Appointments_API.Repositories
 			}
 		}
 
-		public async Task<Appointment?> GetByIdAsync(int appointmentId, string userId)
+		public async Task<Appointment?> GetByIdAsync(int appointmentId)
 		{
-			var appointment = await context.appointments.FirstOrDefaultAsync(a => a.AppointmentID == appointmentId);
-			if (appointment != null)
-			{
-				if (appointment.PatientId == userId || appointment.DoctorId == userId)
-				{
-					return appointment;
-				}
-				else
-				{
-					throw new Exception("You are not allowed to view this appointment");
-				}
-			}
-			return null;
+			return await context.appointments.FirstOrDefaultAsync(a => a.AppointmentID == appointmentId);
 		}
 
 		public async Task<IEnumerable<Appointment>> GetAvailableBySpecialityAsync(string speciality, int pageNumber, int pageSize)
