@@ -20,11 +20,12 @@ namespace Medical_Appointments_API.Controllers
 		}
 
 		/// <summary>
-		/// Get a paginated list of all appointments.
+		/// Get a paginated list of all appointments with error handling, Requires Admin Access.
 		/// </summary>
 		/// <param name="pageNumber">The page number (default is 1).</param>
 		/// <param name="pageSize">The number of items per page (default is 10).</param>
-		/// <returns>A paginated list of appointments.</returns>
+		/// <returns>A paginated list of appointments or an error response if an exception occurs.</returns>
+
 		[HttpGet]
 		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetAllAppointments(
@@ -32,27 +33,43 @@ namespace Medical_Appointments_API.Controllers
 			[FromQuery] int pageSize = 10
 			)
 		{
-			var appointments = await appointmentRepository.GetAllAsync(pageNumber, pageSize);
-			return Ok(appointments);
+			try
+			{
+				var appointments = await appointmentRepository.GetAllAsync(pageNumber, pageSize);
+				return Ok(appointments);
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching appointments.");
+			}
 		}
 
 		/// <summary>
 		/// Get an appointment by its unique identifier.
 		/// </summary>
 		/// <param name="appointmentId">The ID of the appointment to retrieve.</param>
-		/// <returns>The appointment with the specified ID, if found; otherwise, returns NotFound.</returns>
+		/// <returns>
+		/// Returns the appointment with the specified ID if found and the user is authorized;
+		/// otherwise, returns NotFound or Unauthorized as appropriate.
+		/// </returns>
 		[HttpGet("{id}")]
 		[Authorize]
 		public async Task<IActionResult> GetAppointment(int appointmentId)
 		{
-			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			try
 			{
-				var appointment = await appointmentRepository.GetByIdAsync(appointmentId, userId);
+				var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				var appointment = await appointmentRepository.GetByIdAsync(appointmentId);
 				if (appointment == null)
 				{
 					return NotFound();
 				}
+
+				if (!User.IsInRole("Admin") && !appointment.PatientId.Equals(userId) && !appointment.DoctorId.Equals(userId))
+				{
+					return Unauthorized("You Are Not Authorized to View this Appointment");
+				}
+
 				return Ok(appointment);
 			}
 			catch (Exception ex)
@@ -62,7 +79,7 @@ namespace Medical_Appointments_API.Controllers
 		}
 
 		/// <summary>
-		/// Get a list of available appointments for scheduling.
+		/// Get a paginated list of available appointments for scheduling.
 		/// </summary>
 		/// <param name="pageNumber">The page number for pagination (default is 1).</param>
 		/// <param name="pageSize">The number of appointments to include per page (default is 10).</param>
@@ -74,12 +91,19 @@ namespace Medical_Appointments_API.Controllers
 			[FromQuery] int pageSize = 10
 			)
 		{
-			var appointments = await appointmentRepository.GetAvailableAsync(pageNumber, pageSize);
-			return Ok(appointments);
+			try
+			{
+				var appointments = await appointmentRepository.GetAvailableAsync(pageNumber, pageSize);
+				return Ok(appointments);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 
 		/// <summary>
-		/// Get a list of available appointments for a specific medical specialty.
+		/// Get a paginated list of available appointments for a specific medical specialty.
 		/// </summary>
 		/// <param name="speciality">The medical specialty to filter appointments by.</param>
 		/// <param name="pageNumber">The page number for pagination (default is 1).</param>
@@ -93,29 +117,65 @@ namespace Medical_Appointments_API.Controllers
 			[FromQuery] int pageSize = 10
 			)
 		{
-
-			var appointments = await appointmentRepository.GetAvailableBySpecialityAsync(speciality, pageNumber, pageSize);
-			return Ok(appointments);
+			try
+			{
+				var appointments = await appointmentRepository.GetAvailableBySpecialityAsync(speciality, pageNumber, pageSize);
+				return Ok(appointments);
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
 
+
 		/// <summary>
-		/// Get a list of scheduled appointments for the currently authenticated patient.
+		/// Get a paginated list of scheduled appointments for the specified patient.
 		/// </summary>
+		/// <param name="patientId">The ID of the patient whose appointments are being retrieved.</param>
 		/// <param name="pageNumber">The page number for pagination (default is 1).</param>
 		/// <param name="pageSize">The number of appointments to include per page (default is 10).</param>
-		/// <returns>A paginated list of scheduled appointments for the authenticated patient.</returns>
-		// GET: api/appointments/my-appointments
-		[HttpGet("my-appointments")]
-		[Authorize]
+		/// <returns>
+		/// A paginated list of scheduled appointments for the specified patient, 
+		/// or an error message if unauthorized or no appointments are found.
+		/// </returns>
+		[HttpGet("my-appointments/{patientId}")]
+		[Authorize(Roles = "Admin")]
 		public async Task<IActionResult> GetScheduledAppointmentsByPatient(
+			[FromRoute] string patientId,
 			[FromQuery] int pageNumber = 1,
 			[FromQuery] int pageSize = 10
 			)
 		{
-			string patientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			var appointments = await appointmentRepository.GetScheduledByPatientIdAsync(patientId, pageNumber, pageSize);
-			return Ok(appointments);
+			try
+			{
+				// Check if the request comes from an admin or if the patientId matches the ID in the token
+				var isAdmin = User.IsInRole("Admin");
+				var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+				if (!isAdmin && !string.Equals(patientId, authenticatedUserId, StringComparison.OrdinalIgnoreCase))
+				{
+					return Unauthorized("You are not authorized to view appointments for this patient.");
+				}
+
+				// Fetch the scheduled appointments for the specified patient
+				var appointments = await appointmentRepository.GetScheduledByPatientIdAsync(patientId, pageNumber, pageSize);
+
+				// Check if appointments are found
+				if (appointments.Any())
+				{
+					return Ok(appointments);
+				}
+
+				// No appointments found
+				return NotFound("No scheduled appointments found for the specified patient.");
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 		}
+
 
 		/// <summary>
 		/// Create a new appointment by a medical professional for a patient.
@@ -124,26 +184,35 @@ namespace Medical_Appointments_API.Controllers
 		/// <returns>
 		/// Returns a 201 Created response with the created appointment's details if successful.
 		/// Returns a Bad Request (400) response with validation errors if the model state is invalid.
+		/// Returns a Bad Request (400) response with an error message if an error occurs during creation.
 		/// </returns>
 		// POST: api/appointments
 		[HttpPost]
 		[Authorize(Roles = "MedicalProfessional")]
 		public async Task<IActionResult> CreateAppointment(CreateAppointmentDTO appointmentDTO)
 		{
-			if (ModelState.IsValid)
+			try
 			{
-				var appointment = new Appointment
+				if (ModelState.IsValid)
 				{
-					AppointmentDateTime = appointmentDTO.AppointmentDateTime,
-					DoctorId = appointmentDTO.DoctorId,
-					PatientId = appointmentDTO.PatientId,
-				};
-				await appointmentRepository.AddAsync(appointment);
+					var appointment = new Appointment
+					{
+						AppointmentDateTime = appointmentDTO.AppointmentDateTime,
+						DoctorId = appointmentDTO.DoctorId,
+						PatientId = appointmentDTO.PatientId,
+					};
+					await appointmentRepository.AddAsync(appointment);
 
-				return CreatedAtAction(nameof(GetAppointment), new { id = appointment.AppointmentID }, appointment);
+					return CreatedAtAction(nameof(GetAppointment), new { id = appointment.AppointmentID }, appointment);
+				}
+				return BadRequest(ModelState);
 			}
-			return BadRequest(ModelState);
+			catch (Exception ex)
+			{
+				return BadRequest($"An error occurred while creating the appointment: {ex.Message}");
+			}
 		}
+
 
 		/// <summary>
 		/// Book an available appointment by a patient.
@@ -161,17 +230,17 @@ namespace Medical_Appointments_API.Controllers
 		[Authorize]
 		public async Task<IActionResult> BookAppointment(int id, BookAppointmentDTO appointment)
 		{
-			if (id != appointment.AppointmentID)
-			{
-				return BadRequest("ID mismatch");
-			}
-
-			if (!ModelState.IsValid)
-			{
-				return BadRequest(ModelState);
-			}
 			try
 			{
+				if (id != appointment.AppointmentID)
+				{
+					return BadRequest("ID mismatch");
+				}
+
+				if (!ModelState.IsValid)
+				{
+					return BadRequest(ModelState);
+				}
 				await appointmentRepository.BookAsync(appointment);
 				return Ok("appointment Booked Successfully");
 			}
