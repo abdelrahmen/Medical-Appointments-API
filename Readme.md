@@ -2,6 +2,17 @@
 
 Medical Appointments API is a RESTful web service built with ASP.NET Core for managing medical appointments, medical histories, and related data. It provides features for scheduling appointments, maintaining medical histories, and more.
 
+## Roles
+- Admin(only 1):
+	- Can Add Medical Professionals.
+- Medical Professionals:
+	- Can Create Appointments That are avaialable For Patients to Book.
+	- Can cancel booked appoinmtents.
+- Patient:
+	- can search by Medical Professional Speciality for available appointments.
+	- can book appointments created by Medical Professionals.
+	- can create a medical history record for him self.
+
 ## Table of Contents
 
 - [Getting Started](#getting-started)
