@@ -51,7 +51,7 @@ namespace Medical_Appointments_API.Repositories
 		{
 			var appointmets = context.appointments
 				.Include(a => a.Doctor)
-				.Where(a => a.Status.Equals("Available"))
+				.Where(a => a.Status.Equals("Available") && a.AppointmentDateTime > DateTime.Now)
 				.Where(a => a.Doctor.Specialty.Equals(speciality, StringComparison.OrdinalIgnoreCase));
 
 			return await appointmets
@@ -70,7 +70,7 @@ namespace Medical_Appointments_API.Repositories
 		public async Task<IEnumerable<Appointment>> GetAvailableAsync(int pageNumber, int pageSize)
 		{
 			var available = await context.appointments
-				.Where(a => a.Status.Equals("Available"))
+				.Where(a => a.Status.Equals("Available") && a.AppointmentDateTime > DateTime.Now)
 				.Skip((pageNumber - 1) * pageSize)
 				.Take(pageSize).ToListAsync();
 			return available;
