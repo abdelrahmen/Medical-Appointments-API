@@ -36,7 +36,16 @@ namespace Medical_Appointments_API.Controllers
 			try
 			{
 				var appointments = await appointmentRepository.GetAllAsync(pageNumber, pageSize);
-				return Ok(appointments);
+
+				if (appointments == null)
+					return NotFound();
+
+				var appointmentDTOs = new List<AppointmentDTO>();
+				foreach (var item in appointments)
+				{
+					appointmentDTOs.Add(AppointmentDTO.FromAppointment(item));
+				}
+				return Ok(appointmentDTOs);
 			}
 			catch (Exception ex)
 			{
@@ -70,7 +79,8 @@ namespace Medical_Appointments_API.Controllers
 					return Unauthorized("You Are Not Authorized to View this Appointment");
 				}
 
-				return Ok(appointment);
+				AppointmentDTO appointmentDTO = AppointmentDTO.FromAppointment(appointment);
+				return Ok(appointmentDTO);
 			}
 			catch (Exception ex)
 			{
@@ -94,7 +104,17 @@ namespace Medical_Appointments_API.Controllers
 			try
 			{
 				var appointments = await appointmentRepository.GetAvailableAsync(pageNumber, pageSize);
-				return Ok(appointments);
+
+				if (appointments == null)
+					return NotFound();
+
+				var appointmentDTOs = new List<AppointmentDTO>();
+				foreach (var item in appointments)
+				{
+					appointmentDTOs.Add(AppointmentDTO.FromAppointment(item));
+				}
+
+				return Ok(appointmentDTOs);
 			}
 			catch (Exception ex)
 			{
@@ -120,7 +140,17 @@ namespace Medical_Appointments_API.Controllers
 			try
 			{
 				var appointments = await appointmentRepository.GetAvailableBySpecialityAsync(speciality, pageNumber, pageSize);
-				return Ok(appointments);
+
+				if (appointments == null)
+					return NotFound();
+
+				var appointmentDTOs = new List<AppointmentDTO>();
+				foreach (var item in appointments)
+				{
+					appointmentDTOs.Add(AppointmentDTO.FromAppointment(item));
+				}
+
+				return Ok(appointmentDTOs);
 			}
 			catch (Exception ex)
 			{
@@ -164,7 +194,13 @@ namespace Medical_Appointments_API.Controllers
 				// Check if appointments are found
 				if (appointments.Any())
 				{
-					return Ok(appointments);
+					var appointmentDTOs = new List<AppointmentDTO>();
+					foreach (var item in appointments)
+					{
+						appointmentDTOs.Add(AppointmentDTO.FromAppointment(item));
+					}
+
+					return Ok(appointmentDTOs);
 				}
 
 				// No appointments found
