@@ -29,6 +29,7 @@ namespace Medical_Appointments_API
 			builder.Services.AddIdentity<ApplicationUser, IdentityRole>(
 				options =>
 				{
+					options.User.RequireUniqueEmail = true;
 					options.Password.RequireNonAlphanumeric = false;
 					options.Password.RequireDigit = false;
 					options.Password.RequireLowercase = false;
@@ -65,6 +66,13 @@ namespace Medical_Appointments_API
 				app.UseSwagger();
 				app.UseSwaggerUI();
 			}
+
+			app.UseCors(config => {
+				//config.WithOrigins("http://localhost:4200");
+				config.AllowAnyOrigin();
+				config.AllowAnyMethod();
+				config.AllowAnyHeader();
+			});
 
 			app.UseAuthentication();
 			app.UseAuthorization();
