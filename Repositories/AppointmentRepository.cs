@@ -95,7 +95,7 @@ namespace Medical_Appointments_API.Repositories
 				currentAppointment.PatientId = appointment.PatientId;
 				currentAppointment.Notes = appointment.Notes;
 
-				context.appointments.Update(currentAppointment);
+				context.SaveChanges();
 			}
 		}
 
