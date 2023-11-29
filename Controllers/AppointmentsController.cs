@@ -277,7 +277,13 @@ namespace Medical_Appointments_API.Controllers
 				{
 					return BadRequest(ModelState);
 				}
-				await appointmentRepository.BookAsync(appointment);
+				var patientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (patientId is null)
+                {
+					return Unauthorized("{message: \"please login again\"}");
+                }
+				appointment.PatientId = patientId;
+                await appointmentRepository.BookAsync(appointment);
 				return Ok("appointment Booked Successfully");
 			}
 			catch (Exception ex)
