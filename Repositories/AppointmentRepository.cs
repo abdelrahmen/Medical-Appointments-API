@@ -123,7 +123,7 @@ namespace Medical_Appointments_API.Repositories
 
 		public async Task<IEnumerable<Appointment>> GetScheduledByPatientIdAsync(string patientId, int pageNumber, int pageSize)
 		{
-			var appointments = await context.appointments
+			var appointments = await context.appointments.Include(a=>a.Doctor)
 				.Where(a => a.PatientId == patientId)
 				.Skip((pageNumber - 1) * pageSize)
 				.Take(pageSize).ToListAsync();
