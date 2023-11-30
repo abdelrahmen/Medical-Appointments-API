@@ -7,7 +7,6 @@ namespace Medical_Appointments_API.DTO
 		[Required]
 		public int AppointmentID { get; set; }
 
-		[Required]
 		public string? PatientId { get; set; }
 
 		[MaxLength(250)]
