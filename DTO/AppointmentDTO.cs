@@ -23,7 +23,11 @@ namespace Medical_Appointments_API.DTO
 		[MaxLength(250)]
 		public string Notes { get; set; }
 
-		public static AppointmentDTO FromAppointment(Appointment appointment)
+        public string DoctorName { get; set; }
+
+        public String Speciality { get; set; }
+
+        public static AppointmentDTO FromAppointment(Appointment appointment)
 		{
 			return new AppointmentDTO
 			{
@@ -33,7 +37,9 @@ namespace Medical_Appointments_API.DTO
 				Notes = appointment.Notes,
 				DoctorId = appointment.DoctorId,
 				PatientId = appointment.PatientId,
-			};
+                DoctorName = $"{appointment.Doctor.FirstName} {appointment.Doctor.LastName}",
+                Speciality = appointment.Doctor.Specialty,
+            };
 		}
 	}
 }
