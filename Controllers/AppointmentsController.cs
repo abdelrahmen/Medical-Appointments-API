@@ -169,27 +169,20 @@ namespace Medical_Appointments_API.Controllers
 		/// A paginated list of scheduled appointments for the specified patient, 
 		/// or an error message if unauthorized or no appointments are found.
 		/// </returns>
-		[HttpGet("my-appointments/{patientId}")]
-		[Authorize(Roles = "Admin")]
+		[HttpGet("my-appointments")]
+		[Authorize]
 		public async Task<IActionResult> GetScheduledAppointmentsByPatient(
-			[FromRoute] string patientId,
 			[FromQuery] int pageNumber = 1,
 			[FromQuery] int pageSize = 10
 			)
 		{
 			try
 			{
-				// Check if the request comes from an admin or if the patientId matches the ID in the token
-				var isAdmin = User.IsInRole("Admin");
-				var authenticatedUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-				if (!isAdmin && !string.Equals(patientId, authenticatedUserId, StringComparison.OrdinalIgnoreCase))
-				{
-					return Unauthorized("You are not authorized to view appointments for this patient.");
-				}
+				var UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
 				// Fetch the scheduled appointments for the specified patient
-				var appointments = await appointmentRepository.GetScheduledByPatientIdAsync(patientId, pageNumber, pageSize);
+				var appointments = await appointmentRepository.GetScheduledByPatientIdAsync(UserId, pageNumber, pageSize);
 
 				// Check if appointments are found
 				if (appointments.Any())
@@ -301,7 +294,7 @@ namespace Medical_Appointments_API.Controllers
 		/// Returns a Bad Request (400) response with an error message if an error occurs during cancellation.
 		/// </returns>
 		// Put: api/appointments/1
-		[HttpPut("{id}")]
+		[HttpPut("{appointmentId}")]
 		[Authorize]
 		public async Task<IActionResult> CancelAppointment(int appointmentId)
 		{
