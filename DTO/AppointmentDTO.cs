@@ -11,6 +11,10 @@ namespace Medical_Appointments_API.DTO
 		[Required]
 		public string DoctorId { get; set; }
 
+		public string DoctorName { get; set; }
+
+		public String Speciality { get; set; }
+
 		public string? PatientId { get; set; }
 
 		[Required]
@@ -33,6 +37,8 @@ namespace Medical_Appointments_API.DTO
 				Notes = appointment.Notes,
 				DoctorId = appointment.DoctorId,
 				PatientId = appointment.PatientId,
+				DoctorName = $"{appointment.Doctor.FirstName} {appointment.Doctor.LastName}",
+				Speciality = appointment.Doctor.Specialty,
 			};
 		}
 	}
