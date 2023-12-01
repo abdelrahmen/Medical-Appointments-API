@@ -107,7 +107,7 @@ namespace Medical_Appointments_API.Repositories
 				if (currentAppointment.PatientId == userId || currentAppointment.DoctorId == userId)
 				{
 					currentAppointment.Status = "Canceled";
-					currentAppointment.Notes += $"\n [Appointment canceled by user: {userId}]";
+					currentAppointment.Notes += $"\n Appointment canceled by user: {userId}";
 					await context.SaveChangesAsync();
 				}
 				else
