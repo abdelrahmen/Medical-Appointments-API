@@ -20,9 +20,14 @@ namespace Medical_Appointments_API.Repositories
 			await context.SaveChangesAsync();
 		}
 
-		public Task DeleteAsync(int medicalHistoryId)
+		public async Task DeleteAsync(int medicalHistoryId)
 		{
-			throw new NotImplementedException();
+			var history = await context.medicalHistories.FirstOrDefaultAsync(mh => mh.MedicalHistoryID == medicalHistoryId);
+			if (history != null)
+			{
+				context.medicalHistories.Remove(history);
+				await context.SaveChangesAsync();
+			}
 		}
 
 		//gets all histories, requires admin previleges
