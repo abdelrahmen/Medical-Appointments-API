@@ -107,28 +107,18 @@ namespace Medical_Appointments_API.Controllers
 		/// GET /api/MedicalHistory/patient/123
 		/// Authorization: Bearer [Your JWT Token]
 		/// </example>
-		[HttpGet("patient/{patientId}")]
+		[HttpGet()]
 		[Authorize]
-		public async Task<IActionResult> GetAllMedicalHistoryByPatientId(string patientId)
+		public async Task<IActionResult> GetAllMedicalHistoryByPatientId()
 		{
 			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 			try
 			{
-				var medicalHistory = await medicalHistoryRepository.GetByPatientIdAsync(patientId);
+				var medicalHistory = await medicalHistoryRepository.GetByPatientIdAsync(userId);
 				if (medicalHistory == null)
 				{
 					return NotFound();
 				}
-
-				if (!User.IsInRole("MedicalProfessional") && !User.IsInRole("Admin"))
-				{
-					var isAuthorized = medicalHistory.TrueForAll(a => a.UserId.Equals(userId));
-					if (!isAuthorized)
-					{
-						return Unauthorized();
-					}
-				}
-
 				return Ok(medicalHistory);
 
 			}
@@ -180,7 +170,7 @@ namespace Medical_Appointments_API.Controllers
 					};
 					await medicalHistoryRepository.CreateAsync(medicalHistory);
 
-					return CreatedAtAction(nameof(GetMedicalHistory), new { id = medicalHistory.MedicalHistoryID }, medicalHistory);
+					return CreatedAtAction(nameof(GetMedicalHistory), new { historyId = medicalHistory.MedicalHistoryID }, medicalHistory);
 				}
 				catch (Exception ex)
 				{
