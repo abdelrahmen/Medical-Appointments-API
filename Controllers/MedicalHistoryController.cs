@@ -287,5 +287,25 @@ namespace Medical_Appointments_API.Controllers
 			}
 		}
 
-	}
+        [HttpGet("patient/{patientId}")]
+        [Authorize(Roles = "MedicalProfessional,Admin")]
+        public async Task<IActionResult> GetAllMedicalHistoryOfPatientByDoctorUSingPatientId(string patientId)
+        {
+            try
+            {
+                var medicalHistory = await medicalHistoryRepository.GetByPatientIdAsync(patientId);
+                if (medicalHistory == null)
+                {
+                    return NotFound();
+                }
+                return Ok(medicalHistory);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+    }
 }
