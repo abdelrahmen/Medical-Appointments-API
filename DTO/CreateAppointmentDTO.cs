@@ -6,9 +6,6 @@ namespace Medical_Appointments_API.DTO
 {
     public class CreateAppointmentDTO
     {
-		[Required]
-		public string DoctorId { get; set; }
-
 		public string? PatientId { get; set; }
 
 		[Required]

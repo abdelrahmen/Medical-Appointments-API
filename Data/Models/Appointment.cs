@@ -30,6 +30,6 @@ namespace Medical_Appointments_API.Data.Models
 		public string Status { get; set; } // e.g., Available, scheduled, canceled, completed
 
 		[MaxLength(250)]
-		public string Notes { get; set; }
+		public string? Notes { get; set; }
 	}
 }
