@@ -49,9 +49,9 @@ namespace Medical_Appointments_API.Controllers
                 if (result.Succeeded)
                 {
                     await _userManager.AddToRoleAsync(user, "Patient");
-                    return Ok("Registration successful");
+                    return Ok(new { message = "Registration successful, now you can login" });
                 }
-                return BadRequest(result.Errors);
+                return BadRequest(new { errors = string.Join(", ", result.Errors.Select(e => e.Description)) });
             }
             return BadRequest(ModelState);
         }
