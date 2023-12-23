@@ -197,7 +197,7 @@ namespace Medical_Appointments_API.Controllers
                 }
 
                 // No appointments found
-                return NotFound("No scheduled appointments found for the specified patient.");
+                return NotFound(new { message = "No scheduled appointments found for the specified patient." });
             }
             catch (Exception ex)
             {
@@ -264,25 +264,27 @@ namespace Medical_Appointments_API.Controllers
             {
                 if (id != appointment.AppointmentID)
                 {
-                    return BadRequest("ID mismatch");
+                    return BadRequest(new { error = "please refresh the page and try again" });
                 }
 
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);
+                    return BadRequest(new { error = string.Join(", ", ModelState.Values.Select(v => v.Errors.Select(e => e.ErrorMessage))) });
                 }
+
                 var patientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (patientId is null)
                 {
-                    return Unauthorized("{message: \"please login again\"}");
+                    return Unauthorized(new { error = "please login again" });
                 }
+
                 appointment.PatientId = patientId;
                 await appointmentRepository.BookAsync(appointment);
-                return Ok("appointment Booked Successfully");
+                return Ok(new { message = "appointment Booked Successfully" });
             }
             catch (Exception ex)
             {
-                return BadRequest("something wrong happend, please try again later");
+                return BadRequest(new { error = "something wrong happend, please try again later" });
             }
         }
 
