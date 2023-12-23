@@ -19,7 +19,7 @@ Medical Appointments API is a RESTful web service built with ASP.NET Core for ma
 - [Features](#features)
 - [API Endpoints](#api-endpoints)
 - [Authentication](#authentication)
-- [Contributing](#contributing)
+- [Try Out](#try-out)
 
 ## Getting Started
 
@@ -71,3 +71,8 @@ Contributions are welcome! If you'd like to contribute, follow these steps:
 3. Implement your changes and commit them: `git commit -m 'Add new feature'`
 4. Push to your branch: `git push origin feature-name`
 5. Submit a pull request.
+
+## Try Out
+
+you can try the Client App Through:
+https://medical-appointments-client-app.vercel.app/home
