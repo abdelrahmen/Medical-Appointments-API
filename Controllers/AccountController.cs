@@ -153,6 +153,22 @@ namespace Medical_Appointments_API.Controllers
             return BadRequest(ModelState);
         }
 
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetProfileDetails()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound(new { error = "no user found with this id" });
+            }
+
+            return Ok(UserDTO.FromApplicationUser(user));
+        }
+
         private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
         {
             var claims = new List<Claim>
